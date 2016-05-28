@@ -6,7 +6,7 @@ import express from 'express';
 let router = express.Router();
 
 import {successed, fail, failMessage} from '../utils/responseData';
-
+import {admin} from '../middlewares/auth';
 import DB from '../utils/DB';
 
 const DB_NAME = 'post';
@@ -29,16 +29,10 @@ router.get('/list', (req, res) => {
     });
 });
 
-router.post('/new', (req, res) => {
-  const {title, content, category, key} = req.body;
+router.post('/new', admin, (req, res) => {
+  const {title, content, category} = req.body;
   if (!title || !content) {
     res.send(fail(400));
-  }
-
-  let password = require('../../config.json').password;
-  if (key !== password) {
-    res.send(failMessage('...'));
-    return;
   }
 
   let data = {
