@@ -3,7 +3,7 @@ import utils from 'utility';
 import {ObjectId} from 'mongodb';
 
 import DB from '../utils/DB';
-import {successed, failMessage} from '../utils/responseData';
+import {success, failMessage} from '../utils/responseData';
 
 var router = express.Router();
 
@@ -24,6 +24,7 @@ router.post('/register', function(req, res) {
             return;
           }
 
+          // 手动建ObjectId，直接算出token并写入
           let objId = new ObjectId();
           let token = md5(objId, [Date.now()]);
 
@@ -31,7 +32,7 @@ router.post('/register', function(req, res) {
           User.insertOne({username, password: hashPwd, _id: objId, token})
             .then(user => {
               console.log('register success.', user.ops[0]);
-              res.send(successed({token}));
+              res.send(success({token}));
             });
         });
     })
@@ -59,10 +60,12 @@ router.post('/login', function (req, res) {
 
           let user = arr[0];
           let token = md5(user._id, [Date.now()]);
+          
+          // 更新token
           User.updateOne({_id: user._id}, {token})
             .then(r => {
               console.log(r);
-              res.send(successed({token}));
+              res.send(success({token}));
             });
         });
     })

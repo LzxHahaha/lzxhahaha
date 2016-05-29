@@ -3,10 +3,12 @@
  */
 
 import express from 'express';
+import {ObjectId} from 'mongodb';
+
 let router = express.Router();
 
-import {successed, fail, failMessage} from '../utils/responseData';
-import {admin} from '../middlewares/auth';
+import {success, fail, failMessage} from '../utils/responseData';
+import {login, admin} from '../middlewares/auth';
 import DB from '../utils/DB';
 
 const DB_NAME = 'post';
@@ -20,13 +22,26 @@ router.get('/list', (req, res) => {
       console.log('get result');
       result.toArray()
         .then(r => {
-          res.send(successed(r));
+          let posts = r.map(el => ({
+            id: el._id,
+            title: el.title,
+            content: el.content,
+            category: el.category,
+            time: el.time,
+            author: el.author,
+            commentsCount: el.comments.length
+          }));
+          res.send(success(posts));
         });
     })
     .catch(err => {
       console.log('Get post list failed: ', err.message);
       res.send(failMessage(err.message));
     });
+});
+
+router.get('/detail/:id', (req, res) => {
+
 });
 
 router.post('/new', admin, (req, res) => {
@@ -39,16 +54,79 @@ router.post('/new', admin, (req, res) => {
     title,
     content,
     category,
-    time: Date.now()
+    time: Date.now(),
+    author: {
+      _id: req.userInfo._id,
+      // 保存用户名，方便列表查询
+      username: req.userInfo.username
+    },
+    comments: []
   };
   Post.insertOne(data)
     .then(result => {
-      res.send(successed(result.ops));
+      res.send(success(result.ops));
     })
     .catch(err => {
       console.log('Insert new post failed: ', err.message);
       res.send(failMessage(err.message));
     });
+});
+
+router.post('/comment/:id', login, (req, res) => {
+  const objId = new ObjectId(req.params.id);
+
+  Post.find({_id: objId})
+    .then(r => {
+      r.toArray()
+        .then(post => {
+          if (post.length < 1) {
+            res.send(fail(404))
+          }
+          
+          let comment = {
+            content: req.body.comment,
+            time: Date.now(),
+            author: {
+              _id: req.userInfo._id,
+              username: req.userInfo.username
+            }
+          };
+
+          Post.updateOne({_id: objId}, {
+            $push: {comments: comment}
+          }).then(() => {
+            res.send(success())
+          }).catch(err => {
+            console.log(err.stack);
+            res.send(failMessage('评论失败'));
+          });
+        });
+    })
+    .catch(err => {
+      console.log('comment failed:', err.stack);
+      res.send(failMessage());
+    });
+  
+  
+  // Post.findOneAndUpdate({_id: req.params.id}, {
+  //   $push: {
+  //     comments: {
+  //       content: req.body.comment,
+  //       time: Date.now(),
+  //       author: {
+  //         _id: req.userInfo._id,
+  //         username: req.userInfo.username
+  //       }
+  //     }
+  //   }
+  // }).then(result => {
+  //     console.log(result);
+  //     res.send(success());
+  //   })
+  //   .catch(err => {
+  //     console.log('comment failed:', err.stack);
+  //     res.send(failMessage());
+  //   });
 });
 
 export default router;

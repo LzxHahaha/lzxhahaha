@@ -34,9 +34,11 @@ export default class DB {
     return this.connect((db, name)=>db.collection(name).find(conditions).skip(page - 1).limit(size));
   }
 
+  findOneAndUpdate(conditions, data) {
+    return this.connect((db, name)=>db.collection(name).findOneAndUpdate(conditions, data));
+  }
+
   updateOne(conditions, data) {
-    return this.connect((db, name)=>db.collection(name).updateOne(conditions, {
-      $set: data
-    }));
+    return this.connect((db, name)=>db.collection(name).updateOne(conditions, data));
   }
 }

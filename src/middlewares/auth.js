@@ -45,6 +45,7 @@ export function admin(req, res, next) {
       r.toArray()
         .then(user=>{
           if (user.length === 1 && user[0].isAdmin) {
+            req.userInfo = user[0];
             next();
           }
           else {
