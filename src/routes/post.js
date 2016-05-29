@@ -29,6 +29,7 @@ router.get('/list', (req, res) => {
             category: el.category,
             time: el.time,
             author: el.author,
+            // 隐藏comments，只返回数量
             commentsCount: el.comments.length
           }));
           res.send(success(posts));
@@ -82,12 +83,13 @@ router.post('/comment/:id', login, (req, res) => {
           if (post.length < 1) {
             res.send(fail(404))
           }
-          
+
           let comment = {
             content: req.body.comment,
             time: Date.now(),
             author: {
               _id: req.userInfo._id,
+              // 多存一份用户名
               username: req.userInfo.username
             }
           };
@@ -106,27 +108,6 @@ router.post('/comment/:id', login, (req, res) => {
       console.log('comment failed:', err.stack);
       res.send(failMessage());
     });
-  
-  
-  // Post.findOneAndUpdate({_id: req.params.id}, {
-  //   $push: {
-  //     comments: {
-  //       content: req.body.comment,
-  //       time: Date.now(),
-  //       author: {
-  //         _id: req.userInfo._id,
-  //         username: req.userInfo.username
-  //       }
-  //     }
-  //   }
-  // }).then(result => {
-  //     console.log(result);
-  //     res.send(success());
-  //   })
-  //   .catch(err => {
-  //     console.log('comment failed:', err.stack);
-  //     res.send(failMessage());
-  //   });
 });
 
 export default router;
