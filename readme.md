@@ -52,9 +52,7 @@ $ forever start ./dist/bin/www
 **run**
 
 ```
-forever stop dist/bin/www
 babel -d dist/ src/
 cp -rf ./src/public ./dist
 cp -rf ./src/views ./dist
-forever start dist/bin/www
 ```
