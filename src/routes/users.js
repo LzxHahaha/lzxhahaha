@@ -62,7 +62,7 @@ router.post('/login', function (req, res) {
           let token = md5(user._id, [Date.now()]);
           
           // 更新token
-          User.updateOne({_id: user._id}, {token})
+          User.updateOne({_id: user._id}, {$set: {token}})
             .then(r => {
               console.log(r);
               res.send(success({token}));
