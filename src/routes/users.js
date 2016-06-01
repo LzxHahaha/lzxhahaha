@@ -3,75 +3,68 @@ import utils from 'utility';
 import {ObjectId} from 'mongodb';
 
 import DB from '../utils/DB';
-import {success, failMessage} from '../utils/responseData';
+import {success, fail, failMessage} from '../utils/responseData';
 
 var router = express.Router();
 
 var User = new DB('user');
 
-router.post('/register', function(req, res) {
+router.post('/register', async(req, res) => {
   const {username, password} = req.body;
 
   // TODO: 表单验证
 
-  User.find({username})
-    .then(r=>{
-      r.toArray()
-        .then(arr => {
-          // 判断用户名重复
-          if (arr.length > 0) {
-            res.send(failMessage('User already been registered'));
-            return;
-          }
+  try {
+    let result = await User.find({username});
+    let arr = await result.toArray();
+    // 判断用户名重复
+    if (arr.length > 0) {
+      res.send(failMessage('User already been registered'));
+      return;
+    }
 
-          // 手动建ObjectId，直接算出token并写入
-          let objId = new ObjectId();
-          let token = md5(objId, [Date.now()]);
+    // 手动建ObjectId，直接算出token并写入
+    let objId = new ObjectId();
+    let token = md5(objId, [Date.now()]);
 
-          let hashPwd = md5(password);
-          User.insertOne({username, password: hashPwd, _id: objId, token})
-            .then(user => {
-              console.log('register success.', user.ops[0]);
-              res.send(success({token}));
-            });
-        });
-    })
-    .catch(err => {
-      console.log('register error: ', err.stack);
-      res.send(failMessage('注册失败'));
-    });
+    let hashPwd = md5(password);
+
+    await User.insertOne({username, password: hashPwd, _id: objId, token});
+    console.log('register success.', user.ops[0]);
+    res.send(success({token}));
+  }
+  catch (err) {
+    console.log('register error: ', err.stack);
+    res.send(fail());
+  }
 });
 
-router.post('/login', function (req, res) {
+router.post('/login', async(req, res) => {
   const {username, password} = req.body;
 
   // TODO: 表单验证
 
   let hashPwd = md5(password);
 
-  User.find({username, password: hashPwd})
-    .then(r => {
-      r.toArray()
-        .then(arr => {
-          if (arr.length === 0) {
-            res.send(failMessage('用户名或密码错误'));
-            return;
-          }
+  try {
+    let result = await User.find({username, password: hashPwd});
+    let arr = await result.toArray();
+    if (arr.length < 1) {
+      res.send(failMessage('用户名或密码错误'));
+      return;
+    }
 
-          let user = arr[0];
-          let token = md5(user._id, [Date.now()]);
-          
-          // 更新token
-          User.updateOne({_id: user._id}, {$set: {token}})
-            .then(r => {
-              console.log(r);
-              res.send(success({token}));
-            });
-        });
-    })
-    .catch(err => {
-      console.log('login error:', err.stack);
-    });
+    let user = arr[0];
+    let token = md5(user._id, [Date.now()]);
+
+    // 更新token
+    await User.updateOne({_id: user._id}, {$set: {token}});
+    res.send(success({token}));
+  }
+  catch (err) {
+    console.log('login error:', err.stack);
+    res.send(fail());
+  }
 });
 
 export default router;

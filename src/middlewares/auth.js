@@ -7,50 +7,56 @@ import {fail} from '../utils/responseData';
 
 let User = new DB('user');
 
-export function login(req, res, next) {
+export async function login(req, res, next) {
   let failed = fail(401);
 
-  let token = req.header('token');
-  if (!token) {
-    res.send(failed);
-    return;
-  }
+  try {
+    let token = req.header('token');
+    if (!token) {
+      res.send(failed);
+      return;
+    }
 
-  User.find({token: token})
-    .then(r => {
-      r.toArray()
-        .then(user=>{
-          if (user.length === 1) {
-            req.userInfo = user[0];
-            next();
-          }
-          else {
-            res.send(failed);
-          }
-        })
-    });
+    let result = await User.find({token: token});
+    let user = await result.toArray();
+
+    if (user.length === 1) {
+      req.userInfo = user[0];
+      next();
+    }
+    else {
+      res.send(failed);
+    }
+  }
+  catch (err) {
+    console.log(err.stack);
+    res.send(failed);
+  }
 }
 
-export function admin(req, res, next) {
+export async function admin(req, res, next) {
   let failed = fail(401);
 
-  let token = req.header('token');
-  if (!token) {
+  try {
+    let token = req.header('token');
+    if (!token) {
+      res.send(failed);
+      return;
+    }
+
+    let result = await User.find({token: token});
+    let user = await result.toArray();
+    if (user.length === 1 && user[0].isAdmin) {
+      req.userInfo = user[0];
+      next();
+    }
+    else {
+      res.send(failed);
+    }
+  }
+  catch (err) {
+    console.log(err.stack);
     res.send(failed);
-    return;
   }
 
-  User.find({token: token})
-    .then(r => {
-      r.toArray()
-        .then(user=>{
-          if (user.length === 1 && user[0].isAdmin) {
-            req.userInfo = user[0];
-            next();
-          }
-          else {
-            res.send(failed);
-          }
-        })
-    });
 }
