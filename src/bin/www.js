@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 
+require("babel-polyfill");
 var app = require('../app');
 var debug = require('debug')('Blog:server');
 var http = require('http');
