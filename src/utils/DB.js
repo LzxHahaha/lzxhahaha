@@ -17,7 +17,7 @@ export default class DB {
   connect(func) {
     return MongoClient.connect(DB_URL).then(db => {
       func(db, this._dbName);
-      db.close();
+      // db.close();
     });
   }
 
