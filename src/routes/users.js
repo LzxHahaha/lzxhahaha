@@ -19,7 +19,7 @@ router.post('/register', async(req, res) => {
     let arr = await result.toArray();
     // 判断用户名重复
     if (arr.length > 0) {
-      res.send(failMessage('User already been registered'));
+      res.send(failMessage('用户已注册'));
       return;
     }
 
@@ -29,7 +29,7 @@ router.post('/register', async(req, res) => {
 
     let hashPwd = md5(password);
 
-    await User.insertOne({username, password: hashPwd, _id: objId, token});
+    let user = await User.insertOne({username, password: hashPwd, _id: objId, token});
     console.log('register success.', user.ops[0]);
     res.send(success({token}));
   }

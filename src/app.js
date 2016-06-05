@@ -3,6 +3,7 @@ import path from 'path';
 import logger from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
+import multipart from 'connect-multiparty';
 
 import routes from './routes/index';
 import users from './routes/users';
@@ -21,6 +22,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(multipart({uploadDir:'./upload/image'}));
+app.use(express.static('upload'));
 
 app.all('*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*'); // 暂时设为*
