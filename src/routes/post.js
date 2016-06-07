@@ -4,9 +4,6 @@
 
 import express from 'express';
 import {ObjectId} from 'mongodb';
-import multipart from 'connect-multiparty';
-
-var multipartMiddleware = multipart();
 
 let router = express.Router();
 
@@ -23,7 +20,7 @@ router.get('/list', async(req, res) => {
 
   try {
     let result = await Post.all(parseInt(page), parseInt(size));
-    let array = await result.toArray();
+    let array = await result.sort({time: -1}).toArray();
     let posts = array.map(el => ({
       id: el._id,
       title: el.title,
@@ -61,18 +58,20 @@ router.get('/detail/:id', async (req, res) => {
   }
 });
 
-router.post('/new', admin, multipartMiddleware, async(req, res) => {
-  const {title, content, category} = req.body;
+router.post('/new', admin, async(req, res) => {
+  const {title, content, category, headerImage} = req.body;
   if (!title || !content) {
     res.send(fail(400));
   }
+
+  console.log('start')
 
   let data = {
     title,
     content,
     category,
     time: Date.now(),
-    headerImage: req.files.file.path.substring(7),
+    headerImage,
     author: {
       _id: req.userInfo._id,
       // 保存用户名，方便列表查询

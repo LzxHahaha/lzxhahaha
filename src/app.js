@@ -28,7 +28,7 @@ app.use(express.static('upload'));
 
 app.all('*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*'); // 暂时设为*
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With, X-Token');
   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
 
   if (req.method == 'OPTIONS') {

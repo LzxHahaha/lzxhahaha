@@ -3,7 +3,7 @@
  */
 
 import DB from '../utils/DB';
-import {fail} from '../utils/responseData';
+import {fail, failMessage} from '../utils/responseData';
 
 let User = new DB('user');
 
@@ -11,7 +11,8 @@ export async function login(req, res, next) {
   let failed = fail(401);
 
   try {
-    let token = req.header('token');
+    let token = req.header('X-Token');
+    console.log(token);
     if (!token) {
       res.send(failed);
       return;
@@ -35,10 +36,11 @@ export async function login(req, res, next) {
 }
 
 export async function admin(req, res, next) {
-  let failed = fail(401);
+  let failed = failMessage('权限不足');
 
   try {
-    let token = req.header('token');
+    let token = req.header('X-Token');
+    console.log(token);
     if (!token) {
       res.send(failed);
       return;
