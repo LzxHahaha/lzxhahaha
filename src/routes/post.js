@@ -28,7 +28,6 @@ router.get('/list', async(req, res) => {
       category: el.category,
       time: el.time,
       author: el.author,
-      headerImage: el.headerImage,
       // 隐藏comments，只返回数量
       commentsCount: el.comments.length
     }));
@@ -59,7 +58,7 @@ router.get('/detail/:id', async (req, res) => {
 });
 
 router.post('/new', admin, async(req, res) => {
-  const {title, content, category, headerImage} = req.body;
+  const {title, content, category} = req.body;
   if (!title || !content) {
     res.send(fail(400));
   }
@@ -71,7 +70,6 @@ router.post('/new', admin, async(req, res) => {
     content,
     category,
     time: Date.now(),
-    headerImage,
     author: {
       _id: req.userInfo._id,
       // 保存用户名，方便列表查询
