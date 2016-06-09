@@ -63,8 +63,6 @@ router.post('/new', admin, async(req, res) => {
     res.send(fail(400));
   }
 
-  console.log('start')
-
   let data = {
     title,
     content,
@@ -111,6 +109,32 @@ router.post('/comment/:id', login, async(req, res) => {
 
     await Post.updateOne({_id: objId}, {
       $push: {comments: comment}
+    });
+    res.send(success());
+  }
+  catch (err) {
+    console.log('comment failed:', err.stack);
+    res.send(fail());
+  }
+});
+
+router.post('/edit/:id', admin, async(req, res) => {
+  const objId = new ObjectId(req.params.id);
+  const {title, content, category} = req.body;
+  if (!title || !content) {
+    res.send(fail(400));
+  }
+
+  try {
+    let result = await Post.find({_id: objId});
+    let array = await result.toArray();
+
+    if (array.length < 1) {
+      res.send(fail(404))
+    }
+
+    await Post.updateOne({_id: objId}, {
+      $set: {title, content, category}
     });
     res.send(success());
   }
