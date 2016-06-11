@@ -17,9 +17,10 @@ let Post = new DB(DB_NAME);
 
 router.get('/list', async(req, res) => {
   const {page, size, tag} = req.query;
+  const category = tag || /.*/;
 
   try {
-    let result = await Post.find({category: tag}, parseInt(page), parseInt(size));
+    let result = await Post.find({category}, parseInt(page), parseInt(size));
     let array = await result.sort({time: -1}).toArray();
     let posts = array.map(el => ({
       id: el._id,
