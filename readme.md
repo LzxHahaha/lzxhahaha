@@ -9,6 +9,8 @@
 }
 ```
 
+> 不要将config.json上传到git仓库
+
 然后执行
 ```
 $ npm install

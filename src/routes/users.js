@@ -15,7 +15,7 @@ router.post('/register', async(req, res) => {
   // TODO: 表单验证
 
   try {
-    let result = await User.find({username});
+    let result = await User.find({username}, 1, 1);
     let arr = await result.toArray();
     // 判断用户名重复
     if (arr.length > 0) {
@@ -25,6 +25,7 @@ router.post('/register', async(req, res) => {
 
     // 手动建ObjectId，直接算出token并写入
     let objId = new ObjectId();
+    // Token 为id+当前时间戳的md5
     let token = md5(objId, [Date.now()]);
 
     let hashPwd = md5(password);
@@ -47,7 +48,7 @@ router.post('/login', async(req, res) => {
   let hashPwd = md5(password);
 
   try {
-    let result = await User.find({username, password: hashPwd});
+    let result = await User.find({username, password: hashPwd}, 1, 1);
     let arr = await result.toArray();
     if (arr.length < 1) {
       res.send(failMessage('用户名或密码错误'));

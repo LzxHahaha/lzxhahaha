@@ -44,13 +44,27 @@ router.get('/detail/:id', async (req, res) => {
   const objId = new ObjectId(req.params.id);
 
   try {
-    let result = await Post.find({'_id': objId});
+    let result = await Post.find({'_id': objId}, 1, 1);
+
     let arr = await result.toArray();
     if (arr.length < 1) {
       res.send(fail(404));
     }
+    let data = arr[0];
 
-    res.send(success(arr[0]));
+    // 查询前后
+    let next = await (await Post.find({time: {'$lt': data.time}})).toArray();
+    if (next.length > 0) {
+      data.next = next[0]._id;
+      console.log(next[0]);
+    }
+    let prev = await (await Post.find({time: {'$gt': data.time}})).toArray();
+    if (prev.length > 0) {
+      data.prev = prev[0]._id;
+      console.log(prev[0]);
+    }
+
+    res.send(success(data));
   }
   catch (err) {
     console.log('Get post detail failed: ', err.message);
@@ -91,7 +105,7 @@ router.post('/comment/:id', login, async(req, res) => {
   const objId = new ObjectId(req.params.id);
 
   try {
-    let result = await Post.find({_id: objId});
+    let result = await Post.find({_id: objId}, 1, 1);
     let array = await result.toArray();
 
     if (array.length < 1) {
@@ -127,7 +141,7 @@ router.post('/edit/:id', admin, async(req, res) => {
   }
 
   try {
-    let result = await Post.find({_id: objId});
+    let result = await Post.find({_id: objId}, 1, 1);
     let array = await result.toArray();
 
     if (array.length < 1) {
