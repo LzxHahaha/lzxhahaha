@@ -34,6 +34,10 @@ export default class DB {
     return this.connect((db, name)=>db.collection(name).find(conditions).skip(page - 1).limit(size));
   }
 
+  findAll(conditions) {
+    return this.connect((db, name)=>db.collection(name).find(conditions));
+  }
+
   findOneAndUpdate(conditions, data) {
     return this.connect((db, name)=>db.collection(name).findOneAndUpdate(conditions, data));
   }

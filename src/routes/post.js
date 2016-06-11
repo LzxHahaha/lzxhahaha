@@ -53,7 +53,7 @@ router.get('/detail/:id', async (req, res) => {
     let data = arr[0];
 
     // 查询前后
-    let next = await (await Post.find({time: {'$lt': data.time}})).toArray();
+    let next = await (await Post.findAll({time: {'$lt': data.time}})).sort({time: -1}).toArray();
     if (next.length > 0) {
       data.next = next[0]._id;
       console.log(next[0]);
