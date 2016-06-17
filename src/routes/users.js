@@ -15,7 +15,7 @@ router.post('/register', async(req, res) => {
   // TODO: 表单验证
 
   try {
-    let result = await User.find({username}, 1, 1);
+    let result = await User.findOne({username});
     let arr = await result.toArray();
     // 判断用户名重复
     if (arr.length > 0) {
@@ -48,7 +48,7 @@ router.post('/login', async(req, res) => {
   let hashPwd = md5(password);
 
   try {
-    let result = await User.find({username, password: hashPwd}, 1, 1);
+    let result = await User.findOne({username, password: hashPwd});
     let arr = await result.toArray();
     if (arr.length < 1) {
       res.send(failMessage('用户名或密码错误'));

@@ -22,16 +22,32 @@ export default class DB {
     return this.connect((db, name)=>db.collection(name).insertOne(data));
   }
 
-  all(page = 1, size = 10) {
-    if (page < 1 || size < 1) {
-      throw new Error(`Wrong parameters: [page]: ${page}, size: ${size}`);
+  all(paging = true, page = 1, size = 10) {
+    if (paging) {
+      if (page < 1 || size < 1) {
+        throw new Error(`Wrong parameters: [page]: ${page}, size: ${size}`);
+      }
+      return this.connect(((db, name)=>db.collection(name).find().skip((page - 1) * size).limit(size)));
     }
-
-    return this.connect(((db, name)=>db.collection(name).find().skip((page - 1) * size).limit(size)));
+    else {
+      return this.connect(((db, name)=>db.collection(name).find()));
+    }
   }
 
-  find(conditions, page = 1, size = 10) {
-    return this.connect((db, name)=>db.collection(name).find(conditions).skip(page - 1).limit(size));
+  find(conditions, paging = true, page = 1, size = 10) {
+    if (paging) {
+      if (page < 1 || size < 1) {
+        throw new Error(`Wrong parameters: [page]: ${page}, size: ${size}`);
+      }
+      return this.connect((db, name)=>db.collection(name).find(conditions).skip(page - 1).limit(size));
+    }
+    else {
+      return this.connect((db, name)=>db.collection(name).find(conditions));
+    }
+  }
+
+  findOne(conditions) {
+    return this.connect((db, name)=>db.collection(name).find(conditions).limit(1));
   }
 
   findAll(conditions) {

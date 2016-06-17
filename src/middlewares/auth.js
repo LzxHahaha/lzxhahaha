@@ -18,7 +18,7 @@ export async function login(req, res, next) {
       return;
     }
 
-    let result = await User.find({token: token}, 1, 1);
+    let result = await User.findOne({token: token});
     let user = await result.toArray();
 
     if (user.length === 1) {
@@ -46,7 +46,7 @@ export async function admin(req, res, next) {
       return;
     }
 
-    let result = await User.find({token: token}, 1, 1);
+    let result = await User.findOne({token: token});
     let user = await result.toArray();
     if (user.length > 0 && user[0].isAdmin) {
       req.userInfo = user[0];
