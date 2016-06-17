@@ -167,7 +167,6 @@ export async function updateRSS() {
       title: 'LZXHAHAHA',
       description: 'LZXHAHAHA\'s blog',
       site_url: 'http://139.129.131.68/',
-      docs: 'http://example.com/rss/docs.html',
       pubDate: 'Fri, 17 Jun 2016 01:51:00 +0800'
     });
 
