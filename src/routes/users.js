@@ -4,6 +4,7 @@ import {ObjectId} from 'mongodb';
 
 import DB from '../utils/DB';
 import {success, fail, failMessage} from '../utils/responseData';
+import {login} from "../middlewares/auth";
 
 var router = express.Router();
 
@@ -68,20 +69,10 @@ router.post('/login', async(req, res) => {
   }
 });
 
-router.post('/info/:token', async(req, res) => {
-  try {
-    let result = await User.findOne({token: req.params['token']});
-    let user = await result.toArray();
-    if (user.length === 1) {
-      let userInfo = user[0];
-      userInfo.password = undefined;
-      res.send(success(userInfo));
-    }
-    throw new Error();
-  }
-  catch (err) {
-    res.send(fail(401));
-  }
+router.post('/info', login, async(req, res) => {
+  let userInfo = req.userInfo;
+  userInfo.password = undefined;
+  res.send(success(userInfo));
 });
 
 export default router;
