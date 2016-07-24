@@ -68,6 +68,22 @@ router.post('/login', async(req, res) => {
   }
 });
 
+router.post('/info/:token', async(req, res) => {
+  try {
+    let result = await User.findOne({token: req.params['token']});
+    let user = await result.toArray();
+    if (user.length === 1) {
+      let userInfo = user[0];
+      userInfo.password = undefined;
+      res.send(success(userInfo));
+    }
+    throw new Error();
+  }
+  catch (err) {
+    res.send(fail(401));
+  }
+});
+
 export default router;
 
 function md5(message, salts = []) {
