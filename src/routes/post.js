@@ -53,6 +53,7 @@ router.get('/detail/:id', async (req, res) => {
       res.send(fail(404));
     }
     let data = arr[0];
+    data.readCount = data.readCount ? data.readCount + 1 : 1;
 
     // 查询前后
     let prev = await (await Post.findAll({time: {'$lt': data.time}})).sort({time: -1}).toArray();
@@ -65,6 +66,7 @@ router.get('/detail/:id', async (req, res) => {
     }
 
     res.send(success(data));
+    Post.updateOne({'_id': objId}, {$inc: {readCount: 1}});
   }
   catch (err) {
     console.log('Get post detail failed: ', err.message);
