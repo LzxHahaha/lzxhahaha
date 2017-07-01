@@ -1,0 +1,6 @@
+#!/bin/sh
+forever stop ./dist/bin/www.js
+git pull
+npm install
+./run
+forever start ./dist/bin/www.js

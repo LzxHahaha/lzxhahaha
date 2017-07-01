@@ -1,0 +1,5 @@
+#!/bin/sh
+babel -d dist/ src/
+cp -rf ./src/public ./dist
+cp -rf ./src/views ./dist
+
