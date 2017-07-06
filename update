@@ -2,5 +2,5 @@
 forever stop ./dist/bin/www.js
 git pull
 npm install
-./run
+./deploy
 forever start ./dist/bin/www.js
